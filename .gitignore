@@ -1,4 +1,5 @@
 DumbStreamApp/node_modules
+DumbStreamApp/.env
 
 DumbStreamingAPI/node_modules
 DumbStreamingAPI/.env

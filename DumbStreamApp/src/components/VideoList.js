@@ -5,6 +5,7 @@ import { Edit, Delete } from '@material-ui/icons';
 import {
   NavLink,
 } from 'react-router-dom';
+import API from '../api';
 
 const useStyles = makeStyles((theme) => ({
     cardGrid: {
@@ -32,8 +33,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const VideoList = ( { videos } ) => {
+const VideoList = ( { videos, categories, handleVideosChange } ) => {
     const classes = useStyles();
+
+    const handleDeleteVideo = async (event) => {
+      event.preventDefault();
+      const id = event.currentTarget.value;
+      const title = event.currentTarget.name;
+      await API.deleteVideo(id)
+      alert(`Video [${title}] has been deleted`);
+      await handleVideosChange();
+    }
 
     return (
         <Container className={classes.cardGrid} maxWidth="md">
@@ -57,16 +67,20 @@ const VideoList = ( { videos } ) => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <NavLink exact={true} to='/editvideo'>
+                  <NavLink exact={true} to={{
+                    pathname: `editvideo/${video.id}`,
+                    video: video,
+                    categories: categories,
+                    isEdit: true,
+                    handleVideosChange: handleVideosChange
+                  }}>
                     <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
                       <Edit />
                     </IconButton>
                   </NavLink>
-                  <NavLink exact={true} to='/editvideo'>
-                    <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-                      <Delete />
-                    </IconButton>
-                  </NavLink>
+                  <IconButton value={video.id} name={video.title} onClick={handleDeleteVideo} edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                    <Delete />
+                  </IconButton>
                 </CardActions>
               </Card>
             </Grid>

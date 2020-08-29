@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { VideoList, AddVideo, AddCategory, EditVideo } from './components';
+import { VideoList, VideoForm, CategoryForm} from './components';
 import {
   BrowserRouter as Router,
   Switch,
@@ -32,21 +32,40 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+
+const getVideos = async () => {
+  return await API.getVideos();
+};
+
+const getCategories = async () => {
+  return await API.getCategories();
+}
+
+
 const App = () => {
   const classes = useStyles();
 
+  // states
   const [videos, setVideos] = useState();
+  const [categories, setCategories] = useState();
 
-  useEffect(() => {
-    const getVideos = async () => {
-      const videos = await API.getVideos();
-      setVideos(videos);
-    };
+  const handleVideosChange = async () => {
+    const videos = await getVideos();
+    setVideos(videos);
+  }
 
-    getVideos();
+  const handleCategoriesChange = async () => {
+    const categories = await getCategories();
+    setCategories(categories);
+  }
+
+  // componentDidMount
+  useEffect(async () => {
+    await handleVideosChange();
+    await handleCategoriesChange();
   }, []);
-  
-  if (!videos) return <div>Loading .....</div>;
+
+  if (!videos || !categories) return <div>Loading .....</div>;
 
   return (
     <Router>
@@ -64,14 +83,19 @@ const App = () => {
                 Browse Video
               </Button>
             </NavLink>
-            <NavLink exact={true} to='/addvideo'>
+            <NavLink exact={true} to={{
+                    pathname: `/addvideo`,
+                    categories: categories,
+                    isAdd: true,
+                    handleVideosChange: handleVideosChange
+            }}>
               <Button href="#" color="inherit" variant="outlined" className={classes.link}>
                 Add Video
               </Button>
             </NavLink>
             <NavLink exact={true} to='/addcategory'>
               <Button href="#" color="inherit" variant="outlined" className={classes.link}>
-                Add Category
+                Edit Category
               </Button>
             </NavLink>
           </Toolbar>
@@ -79,17 +103,23 @@ const App = () => {
 
         <Switch>
           <Route exact path='/'>
-            <VideoList videos={videos} />
+            <VideoList 
+              videos={videos} 
+              categories={categories}
+              handleVideosChange={handleVideosChange}
+            />
           </Route>
-          <Route exact path='/addvideo'>
-            <AddVideo />
-          </Route>
+
           <Route exact path='/addcategory'>
-            <AddCategory />
+            <CategoryForm 
+              categories={categories}
+              handleCategoriesChange={handleCategoriesChange}
+              handleVideosChange={handleVideosChange}
+            />
           </Route>
-          <Route exact path='/editvideo'>
-            <EditVideo />
-          </Route>
+          
+          <Route exact path='/addvideo' component={VideoForm} />
+          <Route exact path='/editvideo/:id' component={VideoForm} />
         </Switch>
       </div>
     </Router>

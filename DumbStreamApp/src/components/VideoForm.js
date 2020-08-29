@@ -24,25 +24,35 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const AddVideo = () => {
+const VideoForm = (props) => {
     const classes = useStyles();
-    const [categories, setCategory] = useState()
-    const [attributes, setAttributes] = useState({
-        category_id: 1,
-        title: '',
-        attache: '',
-        thumbnail: ''
-    })
-    const getCategories = async () => {
-        const categories = await API.getCategories();
-        setCategory(categories);
-    };
 
-    useEffect(() => {
-        getCategories();
-    }, []);
+    // Props
+    const { categories, handleVideosChange, isEdit, isAdd, video } = props.location;
 
-    const handleChange = (event) => {
+    // Set Initial State
+    let initialAttributes
+    if (isAdd) {
+        initialAttributes = {
+            category_id: 1,
+            title: '',
+            attache: '',
+            thumbnail: ''
+        }
+    }
+    if (isEdit) {
+        initialAttributes = {
+            category_id: video.category_id,
+            title: video.title,
+            attache: video.attache,
+            thumbnail: video.thumbnail
+        }
+    }
+    const [attributes, setAttributes] = useState(initialAttributes)
+
+    // Define Attribute Change
+    const handleAttributeChange = (event) => {
+        event.persist();
         setAttributes(prevState => ({
             ...prevState,
             [event.target.name]: event.target.value
@@ -50,34 +60,38 @@ const AddVideo = () => {
         ))
     }
 
-    const handleSubmit = (event) => {
+    // Choosing the right handler between edit or add video
+    const handleAddSubmit = async (event) => {
         event.preventDefault();
-        console.log(attributes)
-        getCategories();
-        setAttributes(prevState => ({
-            ...prevState,
-            category_id: 1,
-            title: '',
-            attache: '',
-            thumbnail: '',
-        }))
-        // API.addVideo(attributes)
-        //     .then(() => {
-        //         setAttributes(prevState => ({
-        //             attributes,
-        //             ...prevState
-        //         }))
-        //     });
+        await API.addVideo(attributes);
+        alert(`Video titled: [${attributes.title}] has been added`)
+        setAttributes(initialAttributes);
+        await handleVideosChange();
     }
 
+    const handleEditSubmit = async (event) => {
+        event.preventDefault();
+        await API.editVideo(attributes, video.id);
+        alert(`Video has been edited, Browse video to see the changes`)
+        await handleVideosChange();
+    }
+
+    let handleSubmit
+    if (isAdd) {
+        handleSubmit = handleAddSubmit;
+    }
+    if (isEdit) {
+        handleSubmit = handleEditSubmit;
+    }
+
+    // Rendering
     if (!categories) return <div>Loading .....</div>;
-
-
     return (
         <Container component="main" maxWidth="xs">
             <div className={classes.paper}>
                 <Typography component="h1" variant="h5">
-                    Hi! What kind of video you want to add?
+                    {isAdd ? 'Hi! What kind of video you want to add?' : ''}
+                    {isEdit ? 'Hi! Enter attributes you want to edit!' : ''}
                 </Typography>
 
                 <form className={classes.form} onSubmit={handleSubmit}>
@@ -85,27 +99,40 @@ const AddVideo = () => {
                         <Grid item xs={12}>
                             <TextField
                             variant="outlined"
-                            required
+                            required={isAdd}
                             fullWidth
                             id="title"
                             label="Video Title"
                             name="title"
                             autoComplete="title"
                             value={attributes.title}
-                            onInput={handleChange}
+                            onInput={handleAttributeChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <RadioGroup aria-label="category_id" name="category_id" value={attributes.category_id} onChange={handleChange}> 
-                                {categories.map((category) => (
-                                    <FormControlLabel key={category.id} value={category.id} checked={attributes.category_id == category.id} control={<Radio />} label={category.name} />
-                                ))}
+                            <RadioGroup 
+                            aria-label="category_id" 
+                            name="category_id" 
+                            value={attributes.category_id} 
+                            onChange={handleAttributeChange}
+                            > 
+                                {
+                                categories.map((category) => (
+                                    <FormControlLabel 
+                                    key={category.id} 
+                                    value={category.id} 
+                                    checked={attributes.category_id == category.id} 
+                                    control={<Radio />} 
+                                    label={category.name} 
+                                    />
+                                ))
+                                }
                             </RadioGroup>
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
                             variant="outlined"
-                            required
+                            required={isAdd}
                             fullWidth
                             name="attache"
                             label="Attache"
@@ -113,13 +140,13 @@ const AddVideo = () => {
                             id="attache"
                             autoComplete="attache"
                             value={attributes.attache}
-                            onInput={handleChange}
+                            onInput={handleAttributeChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
                             variant="outlined"
-                            required
+                            required={isAdd}
                             fullWidth
                             name="thumbnail"
                             label="Youtube Embedded Url"
@@ -127,7 +154,7 @@ const AddVideo = () => {
                             id="thumbnail"
                             autoComplete="thumbnail"
                             value={attributes.thumbnail}
-                            onInput={handleChange}
+                            onInput={handleAttributeChange}
                             />
                         </Grid>
                     </Grid>
@@ -147,4 +174,4 @@ const AddVideo = () => {
 }
 
 
-export default AddVideo;
+export default VideoForm;
