@@ -1,6 +1,7 @@
+require('dotenv').config();
 const { CategoriesEndpoint, VideosEndpoint } = require('./routes');
-express = require('express');
-path = require('path');
+const express = require('express');
+const path = require('path');
 const app = express();
 const cors = require('cors');
 
