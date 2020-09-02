@@ -165,7 +165,8 @@ const VideoForm = (props) => {
                     color="primary"
                     className={classes.submit}
                     >
-                    Add Video
+                    {isAdd ? 'Add Video' : ''}
+                    {isEdit ? 'Edit Video' : ''}
                     </Button>
                 </form>
             </div>
