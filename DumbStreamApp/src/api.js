@@ -48,7 +48,7 @@ export default class API {
         try {
             const targetUrl = `${URL}/categories`;
             const { data } = await axios.get(targetUrl);
-            data.map(category => {
+            data.forEach(category => {
                 const {id, name} = category;
                 category = {id, name}
             })

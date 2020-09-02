@@ -60,9 +60,9 @@ const App = () => {
   }
 
   // componentDidMount
-  useEffect(async () => {
-    await handleVideosChange();
-    await handleCategoriesChange();
+  useEffect(() => {
+    handleVideosChange()
+      .then(() => handleCategoriesChange());
   }, []);
 
   if (!videos || !categories) return <div>Loading .....</div>;

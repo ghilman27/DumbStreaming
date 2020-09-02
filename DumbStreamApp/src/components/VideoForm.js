@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, Grid, Typography, TextField, Button, Radio, RadioGroup, FormControlLabel} from '@material-ui/core';
 import API from '../api'
@@ -121,7 +121,7 @@ const VideoForm = (props) => {
                                     <FormControlLabel 
                                     key={category.id} 
                                     value={category.id} 
-                                    checked={attributes.category_id == category.id} 
+                                    checked={attributes.category_id === category.id} 
                                     control={<Radio />} 
                                     label={category.name} 
                                     />

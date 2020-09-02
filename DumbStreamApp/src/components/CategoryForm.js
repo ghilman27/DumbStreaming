@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Container, Grid, Typography, TextField, Button, Icon, IconButton } from '@material-ui/core';
+import { Container, Grid, Typography, TextField, Button, } from '@material-ui/core';
 import { Save, Delete } from '@material-ui/icons';
 import API from '../api';
 
@@ -27,9 +27,8 @@ const useStyles = makeStyles((theme) => ({
 const CategoryForm = ({ handleCategoriesChange, handleVideosChange, categories }) => {
     const classes = useStyles();
 
-    let initialCategories = {};
-    categories.map(category => {
-      initialCategories = {...initialCategories, [category.id]: category.name}
+    let initialCategories = categories.reduce((initialCategories, category) => {
+      return {...initialCategories, [category.id]: category.name}
     })
     const [catNames, changeCatNames] = useState(initialCategories);
     const [name, setName] = useState('');
