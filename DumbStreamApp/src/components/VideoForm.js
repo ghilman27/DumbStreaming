@@ -55,7 +55,7 @@ const VideoForm = (props) => {
         event.persist();
         setAttributes(prevState => ({
             ...prevState,
-            [event.target.name]: event.target.value
+            [event.target.name]: parseInt(event.target.value)
         }
         ))
     }
